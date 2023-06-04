@@ -427,8 +427,10 @@ MonoBehaviour:
   rock3: {fileID: 2343060722516579563, guid: 5fc899d95d0da0742b0173451b64c6d3, type: 3}
   rock4: {fileID: 5698532334769455621, guid: 9f7a19782009e9b4ab798cb2b34d7d20, type: 3}
   rock5: {fileID: 8692145397135092393, guid: 7d59f6abec354d64fba8feaefc273677, type: 3}
+  warriorPrefab: {fileID: 2114255966329247376, guid: 41c7b63611a9d52409b5d6e6c1278d16, type: 3}
   suelo: []
   obstacles: []
+  warriors: []
 --- !u!4 &430094936
 Transform:
   m_ObjectHideFlags: 0
