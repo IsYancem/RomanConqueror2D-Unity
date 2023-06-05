@@ -75,7 +75,8 @@ public class GameManager : MonoBehaviour
 
     private void AddWarrior(Vector2 position)
     {
-        Vector2 warriorPosition = new Vector2(position.x, position.y + 1);
+        Vector2 warriorPosition = new Vector2(position.x, position.y + 0.5f);
+        // Vector2 warriorPosition = new Vector2(position.x, position.y + 1);
         if (warriors.Count == 0)
         {
             initialWarriorPosition = warriorPosition;
