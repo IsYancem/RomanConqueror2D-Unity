@@ -151,17 +151,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // public void StartGame()
-    // {
-    //     menuInicioPanel.SetActive(false);
-    //     gameOverPanel.SetActive(false);
-    //     scorePanel.SetActive(true); // Activamos el panel de puntuación al iniciar el juego.
-    //     RomanSoldier.vidas = 5;
-    //     playButton.SetActive(false);
-    //     isGameRunning = true;
-    //     score = 0; // Restablecemos la puntuación a cero.
-    //     UpdateScoreText(); // Actualizamos el texto de puntuación en el panel.
-    // }
     public void StartGame()
     {
         ResetGame(); // Agrega esta línea

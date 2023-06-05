@@ -29,29 +29,6 @@ public class RomanSoldier : MonoBehaviour
         }
     }
 
-    // private void OnCollisionEnter2D(Collision2D collision)
-    // {
-    //     if (collision.gameObject.tag == "Suelo" || collision.gameObject.tag == "Obstacle")
-    //     {
-    //         animator.SetBool("isJump", false);
-    //     }
-
-    //     if (collision.gameObject.tag == "Enemy")
-    //     {
-    //         vidas--;
-
-    //         if (vidas <= 0)
-    //         {
-    //             GameManager.isGameRunning = false;
-    //         }
-    //     }
-
-    //     if (collision.gameObject.tag == "Obstacle") // Si colisiona con un obstáculo, incrementa la puntuación.
-    //     {
-    //         GameManager gameManager = FindObjectOfType<GameManager>();
-    //         gameManager.IncreaseScore(20);
-    //     }
-    // }
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.tag == "Suelo" || collision.gameObject.tag == "Obstacle")
