@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -26,6 +28,9 @@ public class GameManager : MonoBehaviour
 
     public Dictionary<GameObject, Vector2> originalPositions = new Dictionary<GameObject, Vector2>();
     public Dictionary<GameObject, int> warriorDirections = new Dictionary<GameObject, int>();
+
+    public GameObject MenuInicio; // Menu de inicio
+    public GameObject GameOverPanel; // Panel de Game Over
 
     void Start()
     {
@@ -71,6 +76,10 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
+        // Si el MenuInicio está activo, detén el movimiento de los objetos
+        if (MenuInicio.activeSelf)
+            return;
+
         fondo.material.mainTextureOffset = fondo.material.mainTextureOffset + new Vector2(0.02f,0) * Time.deltaTime;
 
         for (int i = 0; i < suelo.Count; i++)
@@ -108,7 +117,7 @@ public class GameManager : MonoBehaviour
                     gameObjects[i].transform.Rotate(0, 180, 0);
                     gameObjects[i].GetComponent<Animator>().Play("Attack");
                     // Cambiamos la dirección del guerrero
-                    warriorDirections[gameObjects[i]] *= 1;
+                    warriorDirections[gameObjects[i]] *= -1;
                 }
                 else
                 {
@@ -123,5 +132,21 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void StartGame()
+    {
+        MenuInicio.SetActive(false);
+        Time.timeScale = 1;
+    }
+
+    public void EndGame()
+    {
+        GameOverPanel.SetActive(true);
+        Time.timeScale = 0;
+    }
+
+    public void RetryGame()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
 }
 

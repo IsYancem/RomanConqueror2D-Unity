@@ -6,6 +6,14 @@ TagManager:
   tags:
   - Suelo
   - Obstacle
+  - Enemy
+  - GameManager
+  - GameOver
+  - MenuInicio
+  - Score
+  - PlayButton
+  - Life
+  - Warrior
   layers:
   - Default
   - TransparentFX

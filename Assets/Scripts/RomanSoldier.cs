@@ -4,42 +4,23 @@ using UnityEngine;
 
 public class RomanSoldier : MonoBehaviour
 {
-    public float fuerzaSalto;
+    private int lives = 3; 
+    private GameManager gameManager;
 
-    private Rigidbody2D rigidbody2D;
-    private Animator animator;
-
-    // Start is called before the first frame update
     void Start()
     {
-        animator = GetComponent<Animator>();
-        rigidbody2D = GetComponent<Rigidbody2D>();
+        gameManager = GameObject.FindObjectOfType<GameManager>(); // para encontrar una referencia al GameManager
     }
 
-    // Update is called once per frame
-    void Update()
+    void OnCollisionEnter2D(Collision2D collision)
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (collision.gameObject.CompareTag("Warrior"))
         {
-            animator.SetBool("isJump", true);
-            rigidbody2D.AddForce(new Vector2(0, fuerzaSalto));
+            lives -= 1;
+            if (lives <= 0)
+            {
+                gameManager.EndGame(); // si las vidas son 0 o menos, llama al método EndGame de GameManager
+            }
         }
     }
-
-    // private void OnCollisionEnter2D(Collision2D collision)
-    // {
-    //     if(collision.gameObject.tag == "Suelo" && collision.gameObject.tag == "Obstacle")
-    //     {
-    //         animator.SetBool("isJump", false);
-    //     }
-    // }
-
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if(collision.gameObject.tag == "Suelo" || collision.gameObject.tag == "Obstacle")
-        {
-            animator.SetBool("isJump", false);
-        }
-    }
-
 }
