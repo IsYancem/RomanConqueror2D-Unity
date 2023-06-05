@@ -2,13 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
     public float velocidad = 2;
     public float warriorSpeed = 3;
-    
+    public TextMeshProUGUI vidaText;
+    public TextMeshProUGUI scoreText;
+    public GameObject playButton;
+    public GameObject gameOverPanel;
+    public GameObject menuInicioPanel;
+    public GameObject scorePanel; // Agregamos una referencia al panel de puntuación.
+
     public Renderer fondo;
     public GameObject col1;
     public GameObject rock1;
@@ -29,11 +35,17 @@ public class GameManager : MonoBehaviour
     public Dictionary<GameObject, Vector2> originalPositions = new Dictionary<GameObject, Vector2>();
     public Dictionary<GameObject, int> warriorDirections = new Dictionary<GameObject, int>();
 
-    public GameObject MenuInicio; // Menu de inicio
-    public GameObject GameOverPanel; // Panel de Game Over
+    public static bool isGameRunning = false;
+
+    private int score = 0;
 
     void Start()
     {
+        playButton.GetComponent<Button>().onClick.AddListener(() => StartGame());
+        gameOverPanel.SetActive(false);
+        menuInicioPanel.SetActive(true);
+        scorePanel.SetActive(false); // Inicialmente, el panel de puntuación estará desactivado.
+
         for (int i = 0; i < 31; i++)
         {
             suelo.Add(Instantiate(col1, new Vector2(-10 + i, -3), Quaternion.identity));
@@ -47,7 +59,9 @@ public class GameManager : MonoBehaviour
         AddObstacle(rock4, new Vector2(17, -3.22f));
         AddObstacle(rock5, new Vector2(26, -3.25f));
 
-        AddWarrior(new Vector2(10, -3)); // Forzamos la creación de un "Warrior" en el inicio
+        AddWarrior(new Vector2(10, -3));
+
+        isGameRunning = false;
     }
 
     private void AddObstacle(GameObject obstaclePrefab, Vector2 position)
@@ -62,26 +76,26 @@ public class GameManager : MonoBehaviour
     private void AddWarrior(Vector2 position)
     {
         Vector2 warriorPosition = new Vector2(position.x, position.y + 1);
-        if (warriors.Count == 0) // solo para el primer "Warrior"
+        if (warriors.Count == 0)
         {
             initialWarriorPosition = warriorPosition;
         }
         GameObject newWarrior = Instantiate(warriorPrefab, warriorPosition, Quaternion.identity);
         warriors.Add(newWarrior);
         originalPositions[newWarrior] = warriorPosition;
-        warriorDirections[newWarrior] = -1; // dirección inicial hacia la izquierda
+        warriorDirections[newWarrior] = -1;
 
-        newWarrior.transform.Rotate(0, 180, 0); // Hace que el Guerrero mire hacia la izquierda
+        newWarrior.transform.Rotate(0, 180, 0);
     }
 
     void Update()
     {
-        // Si el MenuInicio está activo, detén el movimiento de los objetos
-        if (MenuInicio.activeSelf)
+        if (!isGameRunning)
+        {
             return;
+        }
 
-        fondo.material.mainTextureOffset = fondo.material.mainTextureOffset + new Vector2(0.02f,0) * Time.deltaTime;
-
+        fondo.material.mainTextureOffset = fondo.material.mainTextureOffset + new Vector2(0.02f, 0) * Time.deltaTime;
         for (int i = 0; i < suelo.Count; i++)
         {
             if (suelo[i].transform.position.x <= -10)
@@ -91,7 +105,7 @@ public class GameManager : MonoBehaviour
             suelo[i].transform.position = suelo[i].transform.position + new Vector3(-1, 0, 0) * velocidad * Time.deltaTime;
         }
 
-        if (obstacleCounter == nextWarriorObstacle) 
+        if (obstacleCounter == nextWarriorObstacle)
         {
             AddWarrior(new Vector2(10, initialWarriorPosition.y));
             nextWarriorObstacle += Random.Range(5, 15);
@@ -99,6 +113,14 @@ public class GameManager : MonoBehaviour
 
         MoveGameObjects(obstacles);
         MoveGameObjects(warriors);
+
+        if (RomanSoldier.vidas <= 0)
+        {
+            gameOverPanel.SetActive(true);
+            playButton.SetActive(true);
+            isGameRunning = false; // Detenemos el juego cuando el jugador pierde todas las vidas.
+        }
+        vidaText.text = RomanSoldier.vidas.ToString();
     }
 
     private void MoveGameObjects(List<GameObject> gameObjects)
@@ -108,45 +130,97 @@ public class GameManager : MonoBehaviour
             if (gameObjects[i].transform.position.x <= -10)
             {
                 float randomObs = Random.Range(4, 30);
-                Vector2 originalPos = originalPositions[gameObjects[i]]; 
-                gameObjects[i].transform.position = new Vector3(randomObs, originalPos.y, 0); 
+                Vector2 originalPos = originalPositions[gameObjects[i]];
+                gameObjects[i].transform.position = new Vector3(randomObs, originalPos.y, 0);
 
-                // Si el objeto es un guerrero, rotamos 180 grados
-                if (warriors.Contains(gameObjects[i])) 
+                if (warriors.Contains(gameObjects[i]))
                 {
                     gameObjects[i].transform.Rotate(0, 180, 0);
                     gameObjects[i].GetComponent<Animator>().Play("Attack");
-                    // Cambiamos la dirección del guerrero
-                    warriorDirections[gameObjects[i]] *= -1;
+                    warriorDirections[gameObjects[i]] *= 1;
                 }
                 else
                 {
-                    // Incrementa el contador de obstáculos solo cuando es un obstáculo y no un Warrior
                     obstacleCounter++;
                 }
             }
-            // Para los guerreros, utilizamos la dirección almacenada y la velocidad del guerrero
+
             int direction = warriors.Contains(gameObjects[i]) ? warriorDirections[gameObjects[i]] : -1;
             float speed = warriors.Contains(gameObjects[i]) ? warriorSpeed : velocidad;
             gameObjects[i].transform.position = gameObjects[i].transform.position + new Vector3(direction, 0, 0) * speed * Time.deltaTime;
         }
     }
 
+    // public void StartGame()
+    // {
+    //     menuInicioPanel.SetActive(false);
+    //     gameOverPanel.SetActive(false);
+    //     scorePanel.SetActive(true); // Activamos el panel de puntuación al iniciar el juego.
+    //     RomanSoldier.vidas = 5;
+    //     playButton.SetActive(false);
+    //     isGameRunning = true;
+    //     score = 0; // Restablecemos la puntuación a cero.
+    //     UpdateScoreText(); // Actualizamos el texto de puntuación en el panel.
+    // }
     public void StartGame()
     {
-        MenuInicio.SetActive(false);
-        Time.timeScale = 1;
+        ResetGame(); // Agrega esta línea
+
+        menuInicioPanel.SetActive(false);
+        gameOverPanel.SetActive(false);
+        scorePanel.SetActive(true); // Activamos el panel de puntuación al iniciar el juego.
+        RomanSoldier.vidas = 5;
+        playButton.SetActive(false);
+        isGameRunning = true;
+        score = 0; // Restablecemos la puntuación a cero.
+        UpdateScoreText(); // Actualizamos el texto de puntuación en el panel.
     }
 
-    public void EndGame()
+    private void ResetGame()
     {
-        GameOverPanel.SetActive(true);
-        Time.timeScale = 0;
+        // Reinicia la posición del jugador
+        RomanSoldier[] soldiers = FindObjectsOfType<RomanSoldier>();
+        foreach (RomanSoldier soldier in soldiers)
+        {
+            soldier.ResetPosition();
+        }
+
+        // Reinicia la posición de los obstáculos
+        foreach (GameObject obstacle in obstacles)
+        {
+            Vector2 originalPos = originalPositions[obstacle];
+            obstacle.transform.position = originalPos;
+        }
+
+        // Reinicia la posición de los guerreros
+        foreach (GameObject warrior in warriors)
+        {
+            Vector2 originalPos = originalPositions[warrior];
+            warrior.transform.position = originalPos;
+        }
+
+        // Restablece las variables de control
+        obstacleCounter = 0;
+        nextWarriorObstacle = Random.Range(5, 15);
+        score = 0;
     }
 
-    public void RetryGame()
+    public void IncreaseScore(int amount)
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        score += amount; // Incrementamos la puntuación.
+        UpdateScoreText(); // Actualizamos el texto de puntuación en el panel.
+    }
+
+    private void UpdateScoreText()
+    {
+        scoreText.text = score.ToString(); // Actualizamos el texto de puntuación en el panel.
+    }
+
+    public void DecreaseLives()
+    {
+        vidaText.text = "0"; // Actualiza el texto de vidas a "0".
+        gameOverPanel.SetActive(true); // Activa el panel de Game Over.
+        playButton.SetActive(true);
+        isGameRunning = false;
     }
 }
-
