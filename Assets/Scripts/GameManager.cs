@@ -15,6 +15,9 @@ public class GameManager : MonoBehaviour
     public GameObject menuInicioPanel;
     public GameObject scorePanel; // Agregamos una referencia al panel de puntuación.
 
+    public GameObject winPanel;
+    public GameObject cofrePrefab;
+
     public Renderer fondo;
     public Renderer fondo2;
     private int fondoActual = 1; // 1 representa el fondo y 2 representa el fondo2
@@ -70,6 +73,8 @@ public class GameManager : MonoBehaviour
         fondoActual = 1; // Establecer el fondo como fondo inicial
         fondo.gameObject.SetActive(true);
         fondo2.gameObject.SetActive(false);
+
+        winPanel.SetActive(false); // Asegúrate de que el panel Win esté desactivado al principio
     }
 
     private void AddObstacle(GameObject obstaclePrefab, Vector2 position)
@@ -212,12 +217,31 @@ public class GameManager : MonoBehaviour
         obstacleCounter = 0;
         nextWarriorObstacle = Random.Range(5, 15);
         score = 0;
+
+        winPanel.SetActive(false); // Asegúrate de que el panel Win esté desactivado al reiniciar el juego
+
+        // Eliminar el cofre del juego anterior si existe
+        GameObject oldCofre = GameObject.FindGameObjectWithTag("Cofre");
+        if (oldCofre != null)
+        {
+            Destroy(oldCofre);
+        }
     }
 
     public void IncreaseScore(int amount)
     {
-        score += amount; // Incrementamos la puntuación.
-        UpdateScoreText(); // Actualizamos el texto de puntuación en el panel.
+        score += amount;
+        UpdateScoreText();
+
+        // Comprueba si el jugador ha alcanzado 500 puntos
+        if (score >= 500)
+        {
+            winPanel.SetActive(true); // Activa el panel de Win
+            playButton.SetActive(true);
+            isGameRunning = false;
+            // Crear y mostrar un cofre cuando el jugador gana
+            GameObject newCofre = Instantiate(cofrePrefab, new Vector2(0, 0), Quaternion.identity); // Ajusta la posición según sea necesario
+        }
     }
 
     private void UpdateScoreText()

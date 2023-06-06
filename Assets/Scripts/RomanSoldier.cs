@@ -70,7 +70,7 @@ public class RomanSoldier : MonoBehaviour
         if (collision.gameObject.tag == "Obstacle") // Si colisiona con un obstáculo, incrementa la puntuación.
         {
             GameManager gameManager = FindObjectOfType<GameManager>();
-            gameManager.IncreaseScore(5);
+            gameManager.IncreaseScore(10);
         }
     }
 
