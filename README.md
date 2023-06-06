@@ -16,13 +16,13 @@ The game delivers an exciting mix of action and strategy. Players must navigate 
 ![Player State "Run" and "Jump"](Screenshots/image2.png)
 *Image 2. Player States "Run", "Jump", and Score Points"*
 
-![Game State with Coin Rewards](Screenshots/image4.png)
+![Game State with Coin Rewards](Screenshots/image3.png)
 *Image 3. Background Change at 100 Points*
 
-![Player Winning and Chest Open](Screenshots/image3.png)
+![Player Winning and Chest Open](Screenshots/image4.png)
 *Image 4. Player State "GameOver"*
 
-![Player Winning and Chest Open](Screenshots/image3.png)
+![Player Winning and Chest Open](Screenshots/image5.png)
 *Image 5. Player Winning and Chest Open*
 
 ## How to Use the Project
