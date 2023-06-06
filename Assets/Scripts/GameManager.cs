@@ -16,6 +16,10 @@ public class GameManager : MonoBehaviour
     public GameObject scorePanel; // Agregamos una referencia al panel de puntuación.
 
     public Renderer fondo;
+    public Renderer fondo2;
+    private int fondoActual = 1; // 1 representa el fondo y 2 representa el fondo2
+    private int puntosParaCambio = 100;
+
     public GameObject col1;
     public GameObject rock1;
     public GameObject rock2;
@@ -62,6 +66,10 @@ public class GameManager : MonoBehaviour
         AddWarrior(new Vector2(10, -3));
 
         isGameRunning = false;
+
+        fondoActual = 1; // Establecer el fondo como fondo inicial
+        fondo.gameObject.SetActive(true);
+        fondo2.gameObject.SetActive(false);
     }
 
     private void AddObstacle(GameObject obstaclePrefab, Vector2 position)
@@ -76,17 +84,22 @@ public class GameManager : MonoBehaviour
     private void AddWarrior(Vector2 position)
     {
         Vector2 warriorPosition = new Vector2(position.x, position.y + 0.5f);
-        // Vector2 warriorPosition = new Vector2(position.x, position.y + 1);
         if (warriors.Count == 0)
         {
             initialWarriorPosition = warriorPosition;
         }
+        
+        // Genera un número aleatorio para determinar si el guerrero mirará hacia la izquierda o la derecha
+        int direction = Random.Range(0, 2) == 0 ? -1 : 1;
+        Vector3 scale = new Vector3(direction, 1, 1);
+        
         GameObject newWarrior = Instantiate(warriorPrefab, warriorPosition, Quaternion.identity);
         warriors.Add(newWarrior);
         originalPositions[newWarrior] = warriorPosition;
         warriorDirections[newWarrior] = -1;
-
-        newWarrior.transform.Rotate(0, 180, 0);
+        
+        // Aplica la escala para que el guerrero mire hacia la izquierda
+        newWarrior.transform.localScale = scale;
     }
 
     void Update()
@@ -106,10 +119,10 @@ public class GameManager : MonoBehaviour
             suelo[i].transform.position = suelo[i].transform.position + new Vector3(-1, 0, 0) * velocidad * Time.deltaTime;
         }
 
-        if (obstacleCounter == nextWarriorObstacle)
+        // Generar un nuevo guerrero de forma aleatoria
+        if (Random.Range(0, 1000) < 1) // Ajusta el valor 10 según la frecuencia deseada
         {
             AddWarrior(new Vector2(10, initialWarriorPosition.y));
-            nextWarriorObstacle += Random.Range(5, 15);
         }
 
         MoveGameObjects(obstacles);
@@ -164,6 +177,12 @@ public class GameManager : MonoBehaviour
         isGameRunning = true;
         score = 0; // Restablecemos la puntuación a cero.
         UpdateScoreText(); // Actualizamos el texto de puntuación en el panel.
+
+
+
+        fondoActual = 1; // Reiniciar el fondo a fondo al iniciar el juego
+        fondo.gameObject.SetActive(true);
+        fondo2.gameObject.SetActive(false);
     }
 
     private void ResetGame()
@@ -204,6 +223,25 @@ public class GameManager : MonoBehaviour
     private void UpdateScoreText()
     {
         scoreText.text = score.ToString(); // Actualizamos el texto de puntuación en el panel.
+
+        // Comprobar si se alcanzó la cantidad de puntos para cambiar de fondo
+        if (score % puntosParaCambio == 0)
+        {
+            if (fondoActual == 1)
+            {
+                // Cambiar a fondo2
+                fondo.gameObject.SetActive(false);
+                fondo2.gameObject.SetActive(true);
+                fondoActual = 2;
+            }
+            else
+            {
+                // Cambiar a fondo
+                fondo2.gameObject.SetActive(false);
+                fondo.gameObject.SetActive(true);
+                fondoActual = 1;
+            }
+        }
     }
 
     public void DecreaseLives()

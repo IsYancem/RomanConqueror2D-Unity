@@ -6,9 +6,11 @@ public class RomanSoldier : MonoBehaviour
 {
     public float fuerzaSalto;
     public static int vidas = 5;
+    public float velocidadMovimiento; // Velocidad de movimiento del jugador
 
     private Rigidbody2D rigidbody2D;
     private Animator animator;
+    private bool puedeSaltar = true;
 
     void Start()
     {
@@ -23,17 +25,34 @@ public class RomanSoldier : MonoBehaviour
             return;
         }
 
-        if (Input.GetKeyDown(KeyCode.Space)){
+        // Movimiento horizontal
+        float movimientoHorizontal = Input.GetAxis("Horizontal");
+        rigidbody2D.velocity = new Vector2(movimientoHorizontal * velocidadMovimiento, rigidbody2D.velocity.y);
+
+        if (Input.GetKeyDown(KeyCode.Space) && puedeSaltar)
+        {
             animator.SetBool("isJump", true);
             rigidbody2D.AddForce(new Vector2(0, fuerzaSalto));
+            puedeSaltar = false;
+        }
+
+        // Dirección del personaje
+        if (movimientoHorizontal < 0) // Movimiento hacia la izquierda
+        {
+            transform.localScale = new Vector3(-1, 1, 1);
+        }
+        else if (movimientoHorizontal > 0) // Movimiento hacia la derecha
+        {
+            transform.localScale = new Vector3(1, 1, 1);
         }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.tag == "Suelo" || collision.gameObject.tag == "Obstacle")
+        if (collision.gameObject.tag == "Suelo" || collision.gameObject.tag == "Obstacle" || collision.gameObject.tag == "Enemy")
         {
             animator.SetBool("isJump", false);
+            puedeSaltar = true;
         }
 
         if (collision.gameObject.tag == "Enemy")
@@ -51,7 +70,7 @@ public class RomanSoldier : MonoBehaviour
         if (collision.gameObject.tag == "Obstacle") // Si colisiona con un obstáculo, incrementa la puntuación.
         {
             GameManager gameManager = FindObjectOfType<GameManager>();
-            gameManager.IncreaseScore(20);
+            gameManager.IncreaseScore(5);
         }
     }
 
@@ -60,5 +79,6 @@ public class RomanSoldier : MonoBehaviour
         Vector2 initialPosition = new Vector2(0, 0); // Cambia las coordenadas a las que desees que regrese el jugador
         rigidbody2D.velocity = Vector2.zero;
         transform.position = initialPosition;
+        puedeSaltar = true; // Reinicia la capacidad de saltar al reiniciar la posición
     }
 }
